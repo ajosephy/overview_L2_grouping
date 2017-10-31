@@ -1,0 +1,48 @@
+
+% Alex, Paul, Shiny -- Sec. 4.3 -- Grouping of Events
+
+\documentclass[12pt]{article}
+
+\usepackage[backend=biber,
+            citestyle=authoryear,
+            bibstyle=authoryear,
+            natbib]{biblatex}
+\bibliography{L2_grouping.bib}
+
+\begin{document}
+
+\setcounter{section}{4}
+\setcounter{subsection}{2}
+
+\subsection{Grouping of Events}
+In a many-to-one connection, detection reports for all 1024 beams are buffered.
+These reports arrive at a chunked cadence set by the dedispersion process.
+Once all beams have reported for a given chunk, candidate events (L1 headers)
+are grouped in time, DM, and sky position, yielding a singular description for
+bright bursts detected in multiple beams. The clustering is performed with a
+simplified implementation of the DBSCAN algorithm~\citep{dbscan}, which has
+$\mathcal{O}(n\log n)$ complexity and is capable of handling large event rates
+without issue. After clustering, an L2 header is formed. This includes one or
+more L1 headers, along with additional fields which are filled out downstream.
+These fields include a refined position, improved RFI rating, known source
+association, DM to maximum Galactic DM ratio, source class, and flux
+estimation.
+ 
+Position refinement is the first step after the L2 header is
+formed. It is performed by comparing the detected S/Ns from each beam 
+to what is expected from a frequency-dependent beam model. 
+For multi-beam events, a lookup table 
+containing relative S/N ratios for a grid of sky positions and spectral indices
+is precomputed using the beam model. The detected S/Ns are then compared
+to the lookup table to form a best guess of position and spectral index, 
+given the detection pattern and recovered S/N values of the constituent beams. 
+For single-beam events, a precomputed mapping between event S/N
+and the location and uncertainty region is used. The mapping is constructed
+from the distribution of simulated events drawn from the beam model that 
+produce non-detections in adjacent beams. With a refined position and
+estimation of what the on-axis S/N would be, the flux is estimated using the
+radiometer equation applied to single pulses \citep{cordes_mclaughlin03}.
+
+\printbibliography{}
+
+\end{document}
